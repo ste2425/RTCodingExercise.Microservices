@@ -32,8 +32,8 @@ This contains the domain objects for the Catalog.API, the Plate class has been g
 
 ## BuildingBlocks
 ### EventBus
-If you wish to utilise an event bus, we have preinstalled MassTransit for you and RabbitMQ is running in the background. IntegrationsEvents is a handy place to store your Message defenitions, we have provided a base class called IntegrationEvent in which your message templates can inherit from.
-The RabbitMQ control pannel can be accessed on http://localhost:15672 username:guest & password:guest
+If you wish to utilise an event bus, we have preinstalled MassTransit for you and RabbitMQ is running in the background. IntegrationsEvents is a handy place to store your Message definitions, we have provided a base class called IntegrationEvent in which your message templates can inherit from.
+The RabbitMQ control panel can be accessed on http://localhost:15672 username:guest & password:guest
 More information on MassTransit can be found at: https://masstransit-project.com/
 
 ### WebHost
@@ -59,6 +59,8 @@ If you add more Microservice projects, please follow the pattern and add a UnitT
 Please contact your Recruitment agency or us directly with a link to your forked repository.
 
 Good Luck.
+
+
 
 
 
