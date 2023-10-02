@@ -1,4 +1,6 @@
 
+using System.Text.RegularExpressions;
+using Catalog.API.Models;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Catalog.API.Controllers
@@ -13,7 +15,7 @@ namespace Catalog.API.Controllers
             this.db = db;
         }
 
-        public PaginatedResponse<Plate> GetPlates(int page, string sort, string filter)
+        public Task<PaginatedResponse<Plate>> GetPlates(int page, string sort, string filter)
         {
             var query = db.Plates.AsQueryable();
 
@@ -24,7 +26,61 @@ namespace Catalog.API.Controllers
             return ApplyPagination(query, page);
         }
 
-        private PaginatedResponse<Plate> ApplyPagination(IQueryable<Plate> query, int page)
+        public async Task<bool> DeletePlate(Guid plateId)
+        {
+            var plate = await db.Plates.FindAsync(plateId);
+
+            if (plate == null)
+                return false;
+
+            db.Plates.Remove(plate);
+
+            await db.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<Plate?> UpdatePlate(Guid id, PlateModel plate)
+        {
+            var existingPlate = await db.Plates.FindAsync(id);
+
+            if (existingPlate == null)
+                return null;
+
+            existingPlate.Registration = plate.Registration;
+            existingPlate.SalePrice = plate.SalePrice;
+            existingPlate.PurchasePrice = plate.PurchasePrice;
+            existingPlate.Reserved = plate.Reserved;
+            existingPlate.ForSale = plate.ForSale;
+
+            await db.SaveChangesAsync();
+
+            return await db.Plates.FindAsync(id);
+        }
+
+        public async Task<Plate> CreatePlate(PlateModel plate)
+        {
+            var plateNumbers = Regex.Replace(plate.Registration, "[^0-9]", "");
+
+            var newPlate = new Plate()
+            {
+                Registration = plate.Registration,
+                PurchasePrice = plate.PurchasePrice,
+                SalePrice = plate.SalePrice,
+                Letters = Regex.Replace(plate.Registration, "[0-9]", ""),
+                Numbers = int.Parse(plateNumbers),
+                Reserved = plate.Reserved,
+                ForSale = plate.ForSale
+            };
+
+            db.Plates.Add(newPlate);
+
+            await db.SaveChangesAsync();
+
+            return newPlate;
+        }
+
+        private async Task<PaginatedResponse<Plate>> ApplyPagination(IQueryable<Plate> query, int page)
         {
             // This could be put somewhere more generic and shared accross the system
             // It could allow any data access to be paginated
@@ -34,10 +90,10 @@ namespace Catalog.API.Controllers
 
             // Skip/Take pagination is not the most efficient
             // KeySet may be better however it involves a different user experience
-            var results = query
+            var results = await query
                 .Skip(skipRecords)
                 .Take(RECORDS_PER_PAGE)
-                .ToList();
+                .ToListAsync();
 
             return new PaginatedResponse<Plate>(results, page, RECORDS_PER_PAGE, totalPages);
         }

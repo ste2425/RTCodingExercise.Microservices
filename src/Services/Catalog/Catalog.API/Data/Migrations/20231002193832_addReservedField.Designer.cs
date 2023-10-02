@@ -4,6 +4,7 @@ using Catalog.API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Catalog.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231002193832_addReservedField")]
+    partial class addReservedField
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -39,12 +41,6 @@ namespace Catalog.API.Migrations
 
                     b.Property<string>("Registration")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("Reserved")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("ForSale")
-                        .HasColumnType("bit");
 
                     b.Property<decimal>("SalePrice")
                         .HasColumnType("decimal(18,2)");
