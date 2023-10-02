@@ -6,24 +6,30 @@ document.addEventListener('DOMContentLoaded', () => {
         searchBtn = document.querySelector('#plateSearchBtn'),
         previousBtn = document.querySelector('#previousBtn'),
         currentPage = document.querySelector('#currentPage'),
-        nextBtn = document.querySelector('#nextBtn');
+        nextBtn = document.querySelector('#nextBtn'),
+        sortBy = document.querySelector('#sort');
 
     previousBtn.addEventListener('click', () => {
         const page = currentPage.dataset.currentPage;
-        performSearch(textBox.value, parseInt(page) - 1);
+        performSearch(textBox.value, sortBy.value, parseInt(page) - 1);
     });
 
     nextBtn.addEventListener('click', () => {
         const page = currentPage.dataset.currentPage;
-        performSearch(textBox.value, parseInt(page) + 1);
+        performSearch(textBox.value, sortBy.value, parseInt(page) + 1);
     });
 
-    searchBtn.addEventListener('click', () => performSearch(textBox.value));
+    sortBy.addEventListener('change', () => {
+        const page = currentPage.dataset.currentPage;
+        performSearch(textBox.value, sortBy.value, parseInt(page));
+    });
 
-    performSearch('', 0);
+    searchBtn.addEventListener('click', () => performSearch(textBox.value, sortBy.value, 0));
+
+    performSearch('', sortBy.value, 0);
 });
 
-async function performSearch(filter, page = 0) {
+async function performSearch(filter, sort, page) {
     try {
         const template = document.querySelector("#plateTemplate"),
             url = new URL(`${window.apis.catalog}plates`),
@@ -35,6 +41,7 @@ async function performSearch(filter, page = 0) {
     
         url.searchParams.append('filter', filter);
         url.searchParams.append('page', page);
+        url.searchParams.append('sort', sort);
     
         const resp = await fetch(url),
             data = await resp.json();

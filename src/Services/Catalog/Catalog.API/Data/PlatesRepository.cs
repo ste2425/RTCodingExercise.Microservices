@@ -5,7 +5,7 @@ namespace Catalog.API.Controllers
 {
     public class PlatesRepository : IPlatesRepository
     {
-        private const int RECORDS_PER_PAGE = 10;
+        private const int RECORDS_PER_PAGE = 20;
 
         private readonly ApplicationDbContext db;
         public PlatesRepository(ApplicationDbContext db)

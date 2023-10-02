@@ -10,31 +10,22 @@ namespace RTCodingExercise.Microservices.Services
         {
             users.Add(new UserDTO
             {
-                UserName = "joydipkanjilal",
+                Name = "Ben Andrews",
+                UserName = "ben",
                 Password = "test1234",
                 Role = "manager"
             });
             users.Add(new UserDTO
             {
-                UserName = "michaelsanders",
+                Name = "Banjo Kazooie",
+                UserName = "Banjo",
                 Password = "test1234",
                 Role = "developer"
             });
             users.Add(new UserDTO
             {
-                UserName = "stephensmith",
-                Password = "test1234",
-                Role = "tester"
-            });
-            users.Add(new UserDTO
-            {
-                UserName = "rodpaddock",
-                Password = "test1234",
-                Role = "admin"
-            });
-            users.Add(new UserDTO
-            {
-                UserName = "rexwills",
+                Name = "Crash Bandicoot",
+                UserName = "crash",
                 Password = "test1234",
                 Role = "admin"
             });

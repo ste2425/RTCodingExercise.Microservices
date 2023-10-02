@@ -40,21 +40,13 @@ namespace RTCodingExercise.Microservices.Controllers
 
         [AllowAnonymous]
         [Route("login")]
-        [HttpGet]
-        public IActionResult Login()
-        {
-            return View();
-        }
-
-        [AllowAnonymous]
-        [Route("login")]
         [HttpPost]
-        public async Task<IActionResult> PerformLogin(UserModel userModel)
+        public async Task<IActionResult> Login(UserModel userModel)
         {
             if (string.IsNullOrEmpty(userModel.UserName) || string.IsNullOrEmpty(userModel.Password))
                 return RedirectToAction("Error");
 
-            var validUser = GetUser(userModel);
+            var validUser = _userRepository.GetUser(userModel);
 
             if (validUser == null)
                 return RedirectToAction("Error");
@@ -62,8 +54,9 @@ namespace RTCodingExercise.Microservices.Controllers
 
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, validUser.UserName),
+                new Claim(ClaimTypes.Name, validUser.Name),
                 new Claim(ClaimTypes.Role, validUser.Role),
+                new Claim("sub", validUser.UserName)
             };
 
             var claimsIdentity = new ClaimsIdentity(
@@ -74,22 +67,6 @@ namespace RTCodingExercise.Microservices.Controllers
                 new ClaimsPrincipal(claimsIdentity));
 
             return RedirectToAction("Index");
-        }
-
-        private UserDTO GetUser(UserModel userModel)
-        {
-            // Write your code here to authenticate the user     
-            return _userRepository.GetUser(userModel);
-        }
-
-        [Authorize]
-        [Route("mainwindow")]
-        [HttpGet]
-        public IActionResult MainWindow()
-        {
-            ViewBag.Message = "hello";
-
-            return View();
         }
 
         public IActionResult Error()

@@ -44,13 +44,11 @@
                         <li class="nav-item d-flex align-items-center ms-auto">
                             @if (!loggedIn && !isLoginPage)
                             {
-                                <a href="@Url.Action("Login", "Home")" class="btn btn-sm btn-outline-info"
-                                    type="button">Login</a>
+                                <partial name="/Views/Shared/_LoginMenu.cshtml" />
                             }
                             else if (!isLoginPage)
                             {
-                                <a href="@Url.Action("Logout", "Home")" class="btn btn-sm btn-outline-info"
-                                    type="button">Logout</a>
+                                <partial name="/Views/Shared/_UserMenu.cshtml" />
                             }
                         </li>
                     </ul>
