@@ -1,4 +1,5 @@
-﻿using MassTransit;
+﻿using Catalog.API.Controllers;
+using MassTransit;
 using Microsoft.OpenApi.Models;
 using RabbitMQ.Client;
 
@@ -49,6 +50,8 @@ namespace Catalog.API
             services.AddControllers();
             services.AddControllersWithViews();
             services.AddRazorPages();
+
+            services.AddScoped<IPlatesRepository, PlatesRepository>();
 
             services.AddMassTransit(x =>
             {
@@ -110,7 +113,7 @@ namespace Catalog.API
             app.UseSwagger()
                 .UseSwaggerUI(c =>
                 {
-                    c.SwaggerEndpoint($"{ (!string.IsNullOrEmpty(pathBase) ? pathBase : string.Empty) }/swagger/v1/swagger.json", "Catalog.API V1");
+                    c.SwaggerEndpoint($"{(!string.IsNullOrEmpty(pathBase) ? pathBase : string.Empty)}/swagger/v1/swagger.json", "Catalog.API V1");
                 });
 
             app.UseRouting();
