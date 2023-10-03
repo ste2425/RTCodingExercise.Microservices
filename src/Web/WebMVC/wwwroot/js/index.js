@@ -1,3 +1,5 @@
+import { deletePlate, createPlate, toggleReserved, performSearch } from './network/index.js';
+
 // Script for the index page. Perform plate search functionality.
 // The searc functionality should be extracted out into a re-useable module to allow any page to perform plates searches
 
@@ -8,6 +10,69 @@ document.addEventListener('DOMContentLoaded', () => {
         currentPage = document.querySelector('#currentPage'),
         nextBtn = document.querySelector('#nextBtn'),
         sortBy = document.querySelector('#sort');
+
+    // Event delegation. Events buddle so regiser one click and check if the
+    // element is a delete button. Saves lots of even handlers for each individual delete button
+    document.addEventListener('click', async (e) => {
+        if (e.target.matches('.delete')) {
+            const plateId = e.target.dataset.plateId;
+
+            if (!plateId)
+                return;
+
+            e.target.setAttribute('disabled', 'disabled');
+            await deletePlate(plateId);
+
+            e.target.closest('.row').remove();
+        } else if (e.target.matches('.reserve')) {
+            const row = e.target.closest('.row'),
+                buyBtn = row.querySelector('.buy');
+
+            const plate = row.dataset;
+
+            const reserved = await toggleReserved(plate.id, {
+                ...plate,
+                reserved: plate.reserved === 'true',
+                forSale: plate.forSale === 'true'
+            });
+
+            row.dataset.reserved = reserved;
+
+            if (reserved)
+                buyBtn.setAttribute('disabled', 'disabled');
+            else
+                buyBtn.removeAttribute('disabled');
+        }
+    });
+
+    const createPlateBtn = document.querySelector('#createPlate'),
+        createPlateModal = new bootstrap.Modal('#createPlateModal'),
+        createPlateForm = document.querySelector('#createPlateModal form'),
+        submitBtn = createPlateForm.querySelector('[type=submit]');
+
+    if (createPlateBtn)
+        createPlateBtn.addEventListener('click', () => createPlateModal.show());
+
+    createPlateForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        try {
+            submitBtn.setAttribute('disabled', 'disabled');
+            const data = new FormData(e.target);
+            
+            await createPlate({
+                registration: data.get('reg'),
+                purchasePrice: parseInt(data.get('pp')),
+                salePrice: parseInt(data.get('sp')),
+                reserved: false,
+                forSale: true
+            });
+        } catch(e) {
+            console.error('Error saving plate', e);
+        } finally {
+            submitBtn.removeAttribute('disabled');
+            createPlateModal.hide();
+        }
+    });
 
     previousBtn.addEventListener('click', () => {
         const page = currentPage.dataset.currentPage;
@@ -28,54 +93,3 @@ document.addEventListener('DOMContentLoaded', () => {
 
     performSearch('', sortBy.value, 0);
 });
-
-async function performSearch(filter, sort, page) {
-    try {
-        const template = document.querySelector("#plateTemplate"),
-            url = new URL(`${window.apis.catalog}plates`),
-            resultsContainer = document.querySelector('#searchResults'),
-            currencyFormatter = Intl.NumberFormat('en-GB', {
-                style: 'currency',
-                currency: 'GBP',
-            });
-    
-        url.searchParams.append('filter', filter);
-        url.searchParams.append('page', page);
-        url.searchParams.append('sort', sort);
-    
-        const resp = await fetch(url),
-            data = await resp.json();
-    
-        currentPage.textContent = `${data.currentPage + 1} / ${data.totalPages}`;
-        currentPage.dataset.currentPage = data.currentPage;
-    
-        if (data.currentPage > 0)
-            previousBtn.removeAttribute('disabled');
-        else
-            previousBtn.setAttribute('disabled', 'disabled');
-    
-        if (data.currentPage < (data.totalPages - 1))
-            nextBtn.removeAttribute('disabled');
-        else
-            nextBtn.setAttribute('disabled', 'disabled');
-    
-        // clear container. Doesn't remove event handlers but thats not an issue for now
-        resultsContainer.innerHTML = '';
-    
-        data.data.forEach((record) => {
-            const clone = template.content.cloneNode(true);
-    
-            clone.querySelector('.reg').textContent = record.registration;
-            clone.querySelector('.salePrice').textContent = currencyFormatter.format(record.salePrice);
-    
-            resultsContainer.appendChild(clone);
-        });
-    } catch (e) {
-        const toastEl = document.querySelector('#errorToast');
-        new bootstrap.Toast(toastEl).show();
-
-        console.error('Error loading plates', e);
-    } finally {
-
-    }
-}

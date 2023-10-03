@@ -18,6 +18,12 @@
             <option value="SalePrice,desc">Price descending</option>
         </select>
     </div>
+    @if (User.IsInRole(RTCodingExercise.Microservices.Services.Roles.HeadOfComercialOps))
+    {
+        <div class="col-1">
+            <button class="btn btn-primary" id="createPlate">+</button>
+        </div>
+    }
 </div>
 
 <hr />
@@ -47,23 +53,60 @@
         </div>
         <div class="col-4 salePrice"></div>
         <div class="col-4">
-            <button class="btn btn-success">Buy</button>
+            <div class="btn-group">
+                <button type="button" class="btn btn-primary buy">Buy</button>
+
+                @if (User.IsInRole(RTCodingExercise.Microservices.Services.Roles.HeadOfComercialOps))
+                {
+                    <button type="button" class="btn btn-secondary dropdown-toggle dropdown-toggle-split"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <button class="dropdown-item delete">Delete</button>
+                        </li>
+                        <li>
+                            <button class="dropdown-item reserve">Reserve</button>
+                        </li>
+                    </ul>
+                }
+            </div>
         </div>
     </div>
 </template>
 
-<div class="position-fixed top-0 end-0 p-3" style="z-index: 11">
-    <div id="errorToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="toast-header">
-            <strong>Error loading plates</strong>
-            <button type="button" class="btn-close ms-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-        <div class="toast-body">
-            Please try again later.
+<div class="modal" tabindex="-1" id="createPlateModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create a Plate</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form class="d-flex flex-column">
+                    <div class="form-group">
+                        <label for="reg" class="control-label">Registration Number</label>
+                        <input name="reg" id="reg" type="text" class="form-control" />
+                    </div>
+                    <div class="form-group pt-2">
+                        <label for="purchasePrice" class="control-label">Purchase Price</label>
+                        <input name="pp" id="purchasePrice" type="number" class="form-control" />
+                    </div>
+                    <div class="form-group pt-2">
+                        <label for="salePrice" class="control-label">Sale Price</label>
+                        <input name="sp" id="salePrice" type="number" class="form-control" />
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-end">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="ms-2 btn btn-primary save">Save changes</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>
 
 @section Scripts {
-    <script src="~/js/index.js" asp-append-version="true"></script>
+    <script type="module" src="~/js/index.js" asp-append-version="true"></script>
 }

@@ -126,7 +126,8 @@ namespace Catalog.API.Controllers
                 case "desc":
                     return query.OrderByDescending(x => EF.Property<object>(x, field));
                 default:
-                    return query;
+                    // always have a default sort other pagination will be un-deterministic
+                    return query.OrderBy(x => x.Id);
             }
         }
     }
